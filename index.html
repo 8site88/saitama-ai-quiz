@@ -79,18 +79,10 @@
       <div id="rank" class="title-chip"></div>
       <p id="result-copy" class="result-copy"></p>
       <p id="result-meta" class="result-meta"></p>
-      <button id="copy-btn" class="primary" type="button">結果をシェア</button>
+      <button id="image-share-btn" class="primary" type="button">画像を保存する</button>
+      <button id="copy-btn" class="secondary" type="button">シェア用リンクをコピー</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
-    <div id="image-preview" hidden role="dialog" aria-modal="true" aria-label="結果画像の確認" style="position:fixed;inset:0;background:#10251de8;z-index:100;overflow:auto;padding:20px;display:none;align-items:center;justify-content:center">
-      <div style="width:min(100%,520px);background:white;padding:18px;border-radius:20px">
-        <p style="font-weight:900;margin:0 0 12px">結果画像のプレビュー</p><p style="margin:0 0 12px;font-size:.9rem;color:#4c645d">① 画像を保存してThreadsに画像だけ投稿。② 投稿した画像に返信し、コピーしたURLを貼り付けてください。</p>
-        <img id="preview-img" alt="クイズ結果の共有画像" style="width:100%;display:block;border-radius:12px">
-        <button id="download-image" class="primary" type="button" style="margin-top:16px">画像を保存する</button>
-        <button id="copy-share-url" class="secondary" type="button">返信用URLをコピー</button><p id="download-help" role="status" style="font-size:.85rem;color:#4c645d;margin:10px 0">通常は「ダウンロード」フォルダに保存されます。保存できない場合は、上の画像を長押しして「画像をダウンロード」を選んでください。</p>
-        <button id="close-image-preview" class="secondary" type="button">戻る</button>
-      </div>
-    </div>
     <div class="foot">このクイズは非公式のファン作品です。埼玉県・自治体による公式企画ではありません。</div>
   </main>
   <script>
@@ -134,7 +126,7 @@
     function choose(){return shuffle(QUESTIONS).slice(0,10)}
     function show(which){for(const id of ["start","quiz","result"])$(id).hidden=id!==which;window.scrollTo({top:0,behavior:"instant"})}
     function stopTimer(){if(state.timer!==null){clearInterval(state.timer);state.timer=null}}
-    function start(){stopTimer();$("copy-btn").textContent="結果をシェア";state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
+    function start(){stopTimer();$("copy-btn").textContent="シェア用リンクをコピー";state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
     function renderQuestion(){
       state.locked=false;const q=state.selected[state.index];
       $("count").textContent=`第${state.index+1}問 / 10問`;
@@ -172,25 +164,13 @@
     function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
     function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n▼ 埼玉愛クイズに挑戦\nhttps://tonde-saitama007.github.io/saitama-ai-quiz/\n#埼玉愛クイズ`}
     async function copyResult(){
-      const btn=$("copy-btn");
-      const text=shareText();
-      if(navigator.share){
-        try{await navigator.share({text,url:"https://tonde-saitama007.github.io/saitama-ai-quiz/"});return}
-        catch(error){if(error.name==="AbortError")return}
+      const url="https://tonde-saitama007.github.io/saitama-ai-quiz/";
+      let ok=false;
+      try{await navigator.clipboard.writeText(url);ok=true}catch(error){
+        const t=document.createElement("textarea");t.value=url;document.body.appendChild(t);t.focus();t.select();
+        try{ok=document.execCommand("copy")}catch(e){}t.remove();
       }
-      let copied=false;
-      try{await navigator.clipboard.writeText(text);copied=true}catch(error){
-        const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
-        try{copied=document.execCommand("copy")}catch(e){}
-        t.remove();
-      }
-      btn.textContent=copied?"コピーしました！ Threadsに貼り付け":"共有できませんでした";
-    }
-    let imageBlob=null;
-    let imagePreviewUrl=null;
-    function closeImagePreview(){
-      const dialog=$("image-preview");
-      dialog.style.display="none";dialog.hidden=true;
+      $("copy-btn").textContent=ok?"リンクをコピーしました！":"コピーできませんでした";
     }
     async function shareResultImage(){
       const button=$("image-share-btn");
@@ -225,47 +205,23 @@
         ctx.fillStyle="#865016";ctx.fillText(rank,154,759);
         ctx.fillStyle="#4c645d";ctx.font='39px "Noto Sans JP",sans-serif';
         ctx.fillText(description,115,865);
-        imageBlob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
-        if(!imageBlob)throw new Error("PNG unavailable");
-        if(imagePreviewUrl)URL.revokeObjectURL(imagePreviewUrl);
-        imagePreviewUrl=URL.createObjectURL(imageBlob);
-        $("preview-img").src=imagePreviewUrl;
-        $("download-help").textContent="保存すると通常は「ダウンロード」フォルダに入ります。保存できない場合は上の画像を長押しして保存してください。";
-        $("copy-share-url").textContent="返信用URLをコピー";
-        $("image-preview").hidden=false;
-        $("image-preview").style.display="flex";
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+        if(!blob)throw new Error("PNG unavailable");
+        const url=URL.createObjectURL(blob);
+        const link=document.createElement("a");
+        link.href=url;link.download="saitama-love-quiz-result.png";
+        document.body.appendChild(link);link.click();link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
       }catch(error){
-        alert("結果画像を作成できませんでした。文章コピーをお使いください。");
+        alert("画像を保存できませんでした。Chromeで開き直してお試しください。");
       }finally{
-        button.disabled=false;button.textContent="結果画像を見る";
+        button.disabled=false;button.textContent="画像を保存する";
       }
     }
-    function downloadResultImage(){
-      if(!imageBlob)return;
-      const url=URL.createObjectURL(imageBlob);
-      const link=document.createElement("a");
-      link.href=url;link.download="saitama-love-quiz-result.png";
-      document.body.appendChild(link);link.click();link.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),60000);
-      $("download-help").textContent="保存を開始しました。「ファイル」→「ダウンロード」を確認してください。見つからない場合は上の画像を長押しして保存してください。";
-    }
-    $("close-image-preview").addEventListener("click",closeImagePreview);
-    $("download-image").addEventListener("click",downloadResultImage);
-    $("copy-share-url").addEventListener("click",async()=>{
-      const url="https://tonde-saitama007.github.io/saitama-ai-quiz/";
-      let copied=false;
-      try{await navigator.clipboard.writeText(url);copied=true}catch(e){
-        const input=document.createElement("textarea");
-        input.value=url;input.style.position="fixed";input.style.opacity="0";
-        document.body.appendChild(input);input.focus();input.select();
-        try{copied=document.execCommand("copy")}catch(e){}
-        input.remove();
-      }
-      $("copy-share-url").textContent=copied?"返信用URLをコピーしました！":"コピーできませんでした";
-    });
+    $("image-share-btn").addEventListener("click",shareResultImage);
     $("start-btn").addEventListener("click",start);
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
-    $("retry-btn").addEventListener("click",()=>{stopTimer();$("copy-btn").textContent="コピーして結果をシェア";show("start")});
+    $("retry-btn").addEventListener("click",()=>{stopTimer();$("copy-btn").textContent="シェア用リンクをコピー";show("start")});
     $("copy-btn").addEventListener("click",copyResult);
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
