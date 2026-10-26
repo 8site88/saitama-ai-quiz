@@ -249,7 +249,6 @@
       setTimeout(()=>URL.revokeObjectURL(url),60000);
       $("download-help").textContent="保存を開始しました。「ファイル」→「ダウンロード」を確認してください。見つからない場合は上の画像を長押しして保存してください。";
     }
-    $("image-share-btn").addEventListener("click",shareResultImage);
     $("close-image-preview").addEventListener("click",closeImagePreview);
     $("download-image").addEventListener("click",downloadResultImage);
     $("copy-share-url").addEventListener("click",async()=>{
