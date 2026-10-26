@@ -79,8 +79,7 @@
       <div id="rank" class="title-chip"></div>
       <p id="result-copy" class="result-copy"></p>
       <p id="result-meta" class="result-meta"></p>
-      <button id="image-share-btn" class="primary" type="button">結果画像を見る</button>
-      <button id="copy-btn" class="secondary" type="button">コピーして結果をシェア</button>
+      <button id="copy-btn" class="primary" type="button">結果をシェア</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
     <div id="image-preview" hidden role="dialog" aria-modal="true" aria-label="結果画像の確認" style="position:fixed;inset:0;background:#10251de8;z-index:100;overflow:auto;padding:20px;display:none;align-items:center;justify-content:center">
@@ -135,7 +134,7 @@
     function choose(){return shuffle(QUESTIONS).slice(0,10)}
     function show(which){for(const id of ["start","quiz","result"])$(id).hidden=id!==which;window.scrollTo({top:0,behavior:"instant"})}
     function stopTimer(){if(state.timer!==null){clearInterval(state.timer);state.timer=null}}
-    function start(){stopTimer();$("copy-btn").textContent="コピーして結果をシェア";state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
+    function start(){stopTimer();$("copy-btn").textContent="結果をシェア";state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
     function renderQuestion(){
       state.locked=false;const q=state.selected[state.index];
       $("count").textContent=`第${state.index+1}問 / 10問`;
@@ -172,7 +171,21 @@
     function rankFor(points){if(points>=90)return["彩の国マスター","もう埼玉の案内人になれそう！"];if(points>=70)return["埼玉愛の達人","かなり深い埼玉愛です！"];if(points>=50)return["埼玉通","名所も歴史もよく知っています！"];if(points>=30)return["埼玉探検家","新しい埼玉をまだまだ発見できそう！"];return["埼玉ルーキー","ここから埼玉の魅力を探していこう！"]}
     function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
     function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n▼ 埼玉愛クイズに挑戦\nhttps://tonde-saitama007.github.io/saitama-ai-quiz/\n#埼玉愛クイズ`}
-    async function copyResult(){try{await navigator.clipboard.writeText(shareText());$("copy-btn").textContent="コピーしました！"}catch{const t=document.createElement("textarea");t.value=shareText();document.body.append(t);t.select();const ok=document.execCommand("copy");t.remove();$("copy-btn").textContent=ok?"コピーしました！":"コピーできませんでした"}}
+    async function copyResult(){
+      const btn=$("copy-btn");
+      const text=shareText();
+      if(navigator.share){
+        try{await navigator.share({text,url:"https://tonde-saitama007.github.io/saitama-ai-quiz/"});return}
+        catch(error){if(error.name==="AbortError")return}
+      }
+      let copied=false;
+      try{await navigator.clipboard.writeText(text);copied=true}catch(error){
+        const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
+        try{copied=document.execCommand("copy")}catch(e){}
+        t.remove();
+      }
+      btn.textContent=copied?"コピーしました！ Threadsに貼り付け":"共有できませんでした";
+    }
     let imageBlob=null;
     let imagePreviewUrl=null;
     function closeImagePreview(){
