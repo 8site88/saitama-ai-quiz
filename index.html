@@ -1,35 +1,184 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>あなたの埼玉愛は何点？</title>
+  <meta name="theme-color" content="#173f38">
+  <meta name="description" content="埼玉の名所・歴史・グルメに挑戦！30問から10問が出る、15秒制限の埼玉愛クイズ。">
+  <title>あなたの埼玉愛は何点？｜埼玉愛クイズ</title>
   <style>
-    body {
-      font-family: sans-serif;
-      background: #fff6e8;
-      text-align: center;
-      padding: 40px 20px;
-      color: #46352c;
-    }
-    h1 { color: #e46d36; }
-    button {
-      background: #e46d36;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 16px 24px;
-      font-size: 18px;
-      cursor: pointer;
-    }
+    :root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#183a35;background:#f3f5eb}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 90% 0%,#d8eacc 0,transparent 35%),linear-gradient(165deg,#f5f5e8,#e8f2e7)}
+    button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #ef7c38;outline-offset:3px}
+    .wrap{width:min(100% - 28px,680px);margin:0 auto;padding:25px 0 48px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.1em;color:#205b4d;margin-bottom:20px}
+    .brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#1e664f;color:white;font-size:22px}
+    .card{background:#fff;border:1px solid #e0e8d9;border-radius:28px;box-shadow:0 16px 45px #244b3030;padding:clamp(22px,5vw,42px)}
+    .eyebrow{color:#bd5b29;font-weight:900;letter-spacing:.15em;font-size:.85rem;margin:0 0 10px}
+    h1{font-size:clamp(2rem,6vw,3.25rem);line-height:1.25;letter-spacing:-.04em;margin:0 0 18px}
+    h2{font-size:clamp(1.5rem,4.5vw,2rem);line-height:1.4;margin:0 0 20px}
+    p{line-height:1.8}.lead{font-size:1.08rem;color:#4c645d;margin:0 0 25px}
+    .hero-badge{width:90px;height:90px;display:grid;place-items:center;border-radius:26px;background:#fce9bf;font-size:48px;transform:rotate(-7deg);margin:0 0 24px}
+    .howto{background:#f2f7ee;border-radius:16px;padding:16px 20px;margin:20px 0 25px;line-height:1.8}
+    .howto strong{color:#155a46}
+    .level-label{display:block;font-weight:800;margin-bottom:10px}
+    .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:23px}
+    .level{background:#fff;border:2px solid #c9d9c9;color:#2a5145;border-radius:12px;padding:12px 5px;font-weight:800;min-height:48px}
+    .level[aria-pressed="true"]{background:#e1f1dd;border-color:#1e664f;box-shadow:inset 0 0 0 1px #1e664f}
+    .primary,.secondary{width:100%;border:0;border-radius:15px;min-height:54px;font-weight:900;padding:12px 18px}
+    .primary{background:#186a4d;color:white;box-shadow:0 8px 0 #104a39}.primary:hover{background:#11593e}.primary:active{transform:translateY(4px);box-shadow:0 4px 0 #104a39}
+    .secondary{background:#eaf2e8;color:#165640;margin-top:12px}.secondary:hover{background:#d8ebd4}
+    .topline{display:flex;justify-content:space-between;gap:10px;font-weight:900;color:#2a5c4b;margin-bottom:12px}
+    .track{height:10px;border-radius:99px;background:#e5eee3;overflow:hidden;margin-bottom:22px}.fill{height:100%;width:0;background:#e69749;transition:width .35s}
+    .timerbox{display:flex;align-items:center;justify-content:space-between;gap:14px;border:2px solid #dce9d9;border-radius:16px;padding:11px 16px;margin-bottom:20px;font-weight:800}
+    .timerbox.urgent{color:#a13027;border-color:#e8a198;background:#fff6f3}
+    .time{font-size:1.5rem;font-variant-numeric:tabular-nums}
+    .question-tag{color:#bd5b29;font-size:.82rem;font-weight:900;letter-spacing:.12em}
+    .answers{display:grid;gap:10px;margin:20px 0}
+    .answer{width:100%;text-align:left;background:#fff;border:2px solid #dbe5d8;border-radius:14px;padding:15px 17px;color:#153d32;font-weight:800;min-height:57px;line-height:1.45}
+    .answer:hover:not(:disabled){border-color:#1e664f;background:#f4faf1}
+    .answer:disabled{cursor:default}.answer.correct{background:#e2f5e4;border-color:#16834c}.answer.wrong{background:#fff0eb;border-color:#d46a57}
+    .feedback{border-radius:16px;background:#f3f7ed;padding:18px 19px;margin:10px 0 18px;border-left:5px solid #2e7e5d}
+    .feedback.bad{background:#fff5ee;border-left-color:#d07a37}.feedback strong{font-size:1.1rem}.feedback p{margin:6px 0 0}
+    .result-score{font-size:clamp(4rem,15vw,6rem);font-weight:1000;line-height:1;margin:16px 0;color:#146948;letter-spacing:-.08em}
+    .result-score small{font-size:1.4rem;letter-spacing:0;margin-left:8px}
+    .title-chip{display:inline-block;background:#ffedc1;color:#805013;border-radius:999px;font-weight:900;padding:8px 16px;margin:8px 0}
+    .result-copy{color:#476359;margin-bottom:18px}.result-meta{border-top:1px solid #e6ece2;padding-top:15px;color:#426458}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .foot{font-size:.78rem;color:#657a70;text-align:center;margin-top:18px;line-height:1.6}
+    @media(max-width:430px){.wrap{width:min(100% - 20px,680px);padding-top:14px}.card{border-radius:22px}.levels{gap:5px}.level{font-size:.92rem}.topline{font-size:.9rem}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
 <body>
-  <h1>あなたの埼玉愛は何点？</h1>
-  <p>埼玉愛を試すご当地クイズ！</p>
-  <button onclick="alert('動作確認OK！')">
-    ゲームスタート
-  </button>
+  <main class="wrap">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">彩</span><span>SAITAMA LOVE QUIZ</span></div>
+    <section id="start" class="card">
+      <div class="hero-badge" aria-hidden="true">🗾</div>
+      <p class="eyebrow">埼玉を、どこまで知ってる？</p>
+      <h1>あなたの埼玉愛は<br>何点？</h1>
+      <p class="lead">名所、グルメ、歴史まで。10問であなたの埼玉愛を測ろう！</p>
+      <div class="howto"><strong>遊び方</strong><br>30問からランダムで10問。各問4択、制限時間は15秒。正解8点＋早押しボーナス最大2点で、100点満点！</div>
+      <span class="level-label">難易度を選ぼう</span>
+      <div class="levels" role="group" aria-label="難易度">
+        <button class="level" type="button" data-level="easy" aria-pressed="false">初級</button>
+        <button class="level" type="button" data-level="normal" aria-pressed="true">中級</button>
+        <button class="level" type="button" data-level="hard" aria-pressed="false">上級</button>
+      </div>
+      <button id="start-btn" class="primary" type="button">クイズを始める →</button>
+    </section>
+    <section id="quiz" class="card" hidden aria-live="off">
+      <div class="topline"><span id="count"></span><span id="score"></span></div>
+      <div class="track" role="progressbar" aria-label="クイズの進行" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><div id="progress" class="fill"></div></div>
+      <div id="timerbox" class="timerbox"><span>残り時間</span><span id="time" class="time" aria-live="off">15.0秒</span></div>
+      <p id="category" class="question-tag"></p>
+      <h2 id="question" tabindex="-1"></h2>
+      <div id="answers" class="answers" role="group" aria-label="回答の選択肢"></div>
+      <div id="feedback" class="feedback" hidden role="status"></div>
+      <button id="next-btn" class="primary" type="button" hidden>次の問題へ →</button>
+    </section>
+    <section id="result" class="card" hidden aria-live="polite">
+      <p class="eyebrow">RESULT</p>
+      <h1>あなたの埼玉愛は…</h1>
+      <div class="result-score"><span id="final-score">0</span><small>点 / 100点</small></div>
+      <div id="rank" class="title-chip"></div>
+      <p id="result-copy" class="result-copy"></p>
+      <p id="result-meta" class="result-meta"></p>
+      <button id="share-btn" class="primary" type="button">結果をシェアする</button>
+      <button id="copy-btn" class="secondary" type="button">共有文をコピー</button>
+      <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
+    </section>
+    <div class="foot">このクイズは非公式のファン作品です。埼玉県・自治体による公式企画ではありません。</div>
+  </main>
+  <script>
+    "use strict";
+    // 各難易度10問。aは正解の選択肢番号（0〜3）。
+    const QUESTIONS = [
+      {d:"easy",c:"基本",q:"埼玉県の県庁所在地は？",o:["川越市","さいたま市","熊谷市","所沢市"],a:1,e:"県庁はさいたま市浦和区にあります。"},
+      {d:"easy",c:"基本",q:"埼玉県がある地方は？",o:["東北地方","中部地方","関東地方","近畿地方"],a:2,e:"埼玉県は関東地方の内陸県です。"},
+      {d:"easy",c:"記念日",q:"埼玉県民の日は何月何日？",o:["5月5日","8月8日","11月14日","12月1日"],a:2,e:"埼玉県民の日は11月14日。県の誕生にちなみます。"},
+      {d:"easy",c:"名所",q:"「小江戸」の呼び名で親しまれる街は？",o:["川越","秩父","行田","越谷"],a:0,e:"蔵造りの町並みが残る川越は「小江戸」と呼ばれます。"},
+      {d:"easy",c:"グルメ",q:"「草加」といえば、どんな名物？",o:["うどん","せんべい","まんじゅう","ようかん"],a:1,e:"草加せんべいは埼玉を代表する郷土の味です。"},
+      {d:"easy",c:"グルメ",q:"埼玉の名産「狭山茶」は何の飲み物？",o:["紅茶","コーヒー","緑茶","麦茶"],a:2,e:"狭山茶は県西部を中心に作られる緑茶です。"},
+      {d:"easy",c:"自然",q:"埼玉県は海に面している？",o:["太平洋に面する","日本海に面する","両方に面する","海に面しない"],a:3,e:"埼玉県は海のない内陸県です。"},
+      {d:"easy",c:"マスコット",q:"埼玉県のマスコットは？",o:["ぐんまちゃん","コバトン","チーバくん","ひこにゃん"],a:1,e:"コバトンは埼玉県のマスコットです。"},
+      {d:"easy",c:"名所",q:"鉄道博物館があるのは？",o:["さいたま市","川口市","春日部市","秩父市"],a:0,e:"鉄道博物館はさいたま市大宮区にあります。"},
+      {d:"easy",c:"名所",q:"ライン下りや岩畳で知られる場所は？",o:["飯能","長瀞","草加","蕨"],a:1,e:"長瀞の岩畳と荒川ライン下りは人気の観光スポットです。"},
+      {d:"normal",c:"シンボル",q:"埼玉県の花は？",o:["サクラソウ","ヒマワリ","アジサイ","ツツジ"],a:0,e:"県の花はサクラソウです。"},
+      {d:"normal",c:"シンボル",q:"埼玉県の木は？",o:["イチョウ","スギ","ケヤキ","マツ"],a:2,e:"県の木にはケヤキが指定されています。"},
+      {d:"normal",c:"シンボル",q:"埼玉県の「県民の鳥」は？",o:["カワセミ","シラコバト","ツバメ","キジ"],a:1,e:"県民の鳥はシラコバト。コバトンのモチーフでもあります。"},
+      {d:"normal",c:"歴史",q:"「時の鐘」がある街は？",o:["川越市","所沢市","加須市","深谷市"],a:0,e:"時の鐘は川越を代表するシンボルです。"},
+      {d:"normal",c:"自然",q:"芝桜で有名な「羊山公園」があるのは？",o:["熊谷市","秩父市","越谷市","久喜市"],a:1,e:"羊山公園は秩父市にあります。"},
+      {d:"normal",c:"歴史",q:"渋沢栄一の出身地として知られる埼玉県の市は？",o:["上尾市","草加市","深谷市","朝霞市"],a:2,e:"渋沢栄一は現在の深谷市の出身です。"},
+      {d:"normal",c:"名物",q:"「深谷」の特産として知られる野菜は？",o:["トマト","ねぎ","れんこん","キャベツ"],a:1,e:"深谷ねぎは埼玉県を代表する農産物の一つです。"},
+      {d:"normal",c:"歴史",q:"足袋の産地として知られる市は？",o:["行田市","川口市","三郷市","坂戸市"],a:0,e:"行田には足袋づくりの歴史があります。"},
+      {d:"normal",c:"自然",q:"長瀞の岩畳を流れる川は？",o:["利根川","多摩川","荒川","江戸川"],a:2,e:"長瀞では荒川沿いに岩畳が広がります。"},
+      {d:"normal",c:"県政",q:"埼玉県の愛称は？",o:["森の国","彩の国","水の国","光の国"],a:1,e:"埼玉県の愛称は「彩の国」です。"},
+      {d:"hard",c:"シンボル",q:"埼玉県の蝶は？",o:["アサギマダラ","モンシロチョウ","ミドリシジミ","アゲハチョウ"],a:2,e:"県の蝶はミドリシジミです。"},
+      {d:"hard",c:"シンボル",q:"埼玉県の魚は？",o:["アユ","ムサシトミヨ","メダカ","コイ"],a:1,e:"県の魚はムサシトミヨです。"},
+      {d:"hard",c:"県章",q:"埼玉県の県章は何個の勾玉を並べた形？",o:["8個","12個","16個","24個"],a:2,e:"16個の勾玉を円形に並べたデザインです。"},
+      {d:"hard",c:"歴史",q:"「日本の航空発祥の地」として知られる市は？",o:["所沢市","入間市","羽生市","桶川市"],a:0,e:"所沢には日本初の飛行場が設けられました。"},
+      {d:"hard",c:"史跡",q:"古墳時代の横穴墓群「吉見百穴」がある町は？",o:["小川町","吉見町","寄居町","杉戸町"],a:1,e:"吉見百穴は比企郡吉見町にあります。"},
+      {d:"hard",c:"歴史",q:"「忍城（おしじょう）」ゆかりの市は？",o:["鴻巣市","戸田市","行田市","本庄市"],a:2,e:"忍城は行田市にある城跡です。"},
+      {d:"hard",c:"歴史",q:"埼玉県民の日が制定された年は？",o:["1871年","1921年","1971年","2001年"],a:2,e:"埼玉県誕生から100年にあたる1971年に制定されました。"},
+      {d:"hard",c:"史跡",q:"「さきたま古墳群」がある市は？",o:["行田市","秩父市","川口市","狭山市"],a:0,e:"さきたま古墳群は行田市にあります。"},
+      {d:"hard",c:"自然",q:"ロウバイ園で知られる長瀞町の山は？",o:["武甲山","宝登山","両神山","雲取山"],a:1,e:"宝登山の山頂付近にロウバイ園があります。"},
+      {d:"hard",c:"歴史",q:"埼玉県が現在とほぼ同じ形になったのは何年？",o:["1871年","1876年","1911年","1971年"],a:1,e:"1876年に旧入間県の地域と合併し、ほぼ現在の形になりました。"}
+    ];
+    const MIX={easy:[6,3,1],normal:[3,4,3],hard:[1,3,6]};
+    const LABEL={easy:"初級",normal:"中級",hard:"上級"};
+    const $=id=>document.getElementById(id);
+    const state={level:"normal",selected:[],index:0,points:0,correct:0,deadline:0,timer:null,locked:false};
+    const shuffle=list=>{const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+    function choose(){return shuffle(["easy","normal","hard"].flatMap((d,i)=>shuffle(QUESTIONS.filter(q=>q.d===d)).slice(0,MIX[state.level][i])))}
+    function show(which){for(const id of ["start","quiz","result"])$(id).hidden=id!==which;window.scrollTo({top:0,behavior:"instant"})}
+    function stopTimer(){if(state.timer!==null){clearInterval(state.timer);state.timer=null}}
+    function start(){stopTimer();state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
+    function renderQuestion(){
+      state.locked=false;const q=state.selected[state.index];
+      $("count").textContent=`第${state.index+1}問 / 10問`;
+      $("score").textContent=`${state.points}点`;
+      $("progress").style.width=`${state.index*10}%`;
+      document.querySelector(".track").setAttribute("aria-valuenow",String(state.index));
+      $("category").textContent=`${LABEL[q.d]} · ${q.c}`;
+      $("question").textContent=q.q;
+      $("feedback").hidden=true;$("next-btn").hidden=true;
+      const answers=$("answers");answers.replaceChildren();
+      q.o.forEach((option,i)=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=`${"ABCD"[i]}. ${option}`;b.addEventListener("click",()=>answer(i));answers.append(b)});
+      $("timerbox").classList.remove("urgent");
+      state.deadline=performance.now()+15000;tick();state.timer=setInterval(tick,50);
+      $("question").focus({preventScroll:true});
+    }
+    function tick(){if(state.locked)return;const ms=Math.max(0,state.deadline-performance.now());$("time").textContent=`${(ms/1000).toFixed(1)}秒`;$("timerbox").classList.toggle("urgent",ms<=5000);if(ms<=0)answer(null)}
+    function answer(choice){
+      if(state.locked)return;
+      const remaining=Math.max(0,state.deadline-performance.now());
+      if(remaining<=0)choice=null;
+      state.locked=true;stopTimer();
+      const q=state.selected[state.index],isCorrect=choice===q.a;
+      let gained=0;
+      if(isCorrect){const elapsed=15-remaining/1000;const bonus=elapsed<=5?2:elapsed<=10?1:0;gained=8+bonus;state.points+=gained;state.correct++}
+      $("score").textContent=`${state.points}点`;
+      [...$("answers").children].forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add("correct");else if(i===choice)b.classList.add("wrong")});
+      const feedback=$("feedback");feedback.classList.toggle("bad",!isCorrect);
+      const heading=document.createElement("strong");heading.textContent=isCorrect?`正解！ +${gained}点`:choice===null?"時間切れ！":"残念！";
+      const detail=document.createElement("p");detail.textContent=`正解：${q.o[q.a]}。${q.e}`;
+      feedback.replaceChildren(heading,detail);feedback.hidden=false;
+      $("next-btn").textContent=state.index===9?"結果を見る →":"次の問題へ →";$("next-btn").hidden=false;
+      $("next-btn").focus({preventScroll:true});
+    }
+    function rankFor(points){if(points>=90)return["彩の国マスター","もう埼玉の案内人になれそう！"];if(points>=70)return["埼玉愛の達人","かなり深い埼玉愛です！"];if(points>=50)return["埼玉通","名所も歴史もよく知っています！"];if(points>=30)return["埼玉探検家","新しい埼玉をまだまだ発見できそう！"];return["埼玉ルーキー","ここから埼玉の魅力を探していこう！"]}
+    function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`${LABEL[state.level]} · 10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
+    function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${LABEL[state.level]}で${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n${location.href.split("#")[0]}\n#埼玉愛クイズ`}
+    async function copyResult(){try{await navigator.clipboard.writeText(shareText());$("copy-btn").textContent="コピーしました！"}catch{const t=document.createElement("textarea");t.value=shareText();document.body.append(t);t.select();const ok=document.execCommand("copy");t.remove();$("copy-btn").textContent=ok?"コピーしました！":"コピーできませんでした"}}
+    document.querySelectorAll(".level").forEach(b=>b.addEventListener("click",()=>{state.level=b.dataset.level;document.querySelectorAll(".level").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))}));
+    $("start-btn").addEventListener("click",start);
+    $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
+    $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
+    $("copy-btn").addEventListener("click",copyResult);
+    $("share-btn").addEventListener("click",async()=>{const text=shareText();if(navigator.share){try{await navigator.share({text})}catch(e){if(e.name!=="AbortError")copyResult()}}else{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,"_blank","noopener,noreferrer")}});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
+  </script>
 </body>
 </html>
