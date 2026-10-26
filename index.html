@@ -170,7 +170,7 @@
     }
     function rankFor(points){if(points>=90)return["彩の国マスター","もう埼玉の案内人になれそう！"];if(points>=70)return["埼玉愛の達人","かなり深い埼玉愛です！"];if(points>=50)return["埼玉通","名所も歴史もよく知っています！"];if(points>=30)return["埼玉探検家","新しい埼玉をまだまだ発見できそう！"];return["埼玉ルーキー","ここから埼玉の魅力を探していこう！"]}
     function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`${LABEL[state.level]} · 10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
-    function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${LABEL[state.level]}で${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n${location.href.split("#")[0]}\n#埼玉愛クイズ`}
+    function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${LABEL[state.level]}で${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n▼ 埼玉愛クイズに挑戦\nhttps://tonde-saitama007.github.io/saitama-ai-quiz/\n#埼玉愛クイズ`}
     async function copyResult(){try{await navigator.clipboard.writeText(shareText());$("copy-btn").textContent="コピーしました！"}catch{const t=document.createElement("textarea");t.value=shareText();document.body.append(t);t.select();const ok=document.execCommand("copy");t.remove();$("copy-btn").textContent=ok?"コピーしました！":"コピーできませんでした"}}
     document.querySelectorAll(".level").forEach(b=>b.addEventListener("click",()=>{state.level=b.dataset.level;document.querySelectorAll(".level").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))}));
     $("start-btn").addEventListener("click",start);
