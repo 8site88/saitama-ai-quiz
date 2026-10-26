@@ -85,7 +85,7 @@
       <div id="rank" class="title-chip"></div>
       <p id="result-copy" class="result-copy"></p>
       <p id="result-meta" class="result-meta"></p>
-      <button id="share-btn" class="primary" type="button">結果をシェアする</button>
+      <button id="share-btn" class="primary" type="button">Threadsに投稿</button>
       <button id="copy-btn" class="secondary" type="button">共有文をコピー</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
@@ -177,7 +177,7 @@
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
     $("copy-btn").addEventListener("click",copyResult);
-    $("share-btn").addEventListener("click",async()=>{const text=shareText();if(navigator.share){try{await navigator.share({text})}catch(e){if(e.name!=="AbortError")copyResult()}}else{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,"_blank","noopener,noreferrer")}});
+    $("share-btn").addEventListener("click",()=>{const url=new URL("https://www.threads.com/intent/post");url.searchParams.set("text",shareText());window.open(url.toString(),"_blank","noopener,noreferrer")});
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
 </body>
