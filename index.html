@@ -181,7 +181,7 @@
       const text=shareText();
       if(navigator.share){
         try{
-          await navigator.share({title:"埼玉愛クイズの結果",text});
+          await navigator.share({text});
           return;
         }catch(err){
           if(err.name==="AbortError")return;
