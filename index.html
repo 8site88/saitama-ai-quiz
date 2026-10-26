@@ -83,6 +83,15 @@
       <button id="copy-btn" class="secondary" type="button">コピーして結果をシェア</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
+    <div id="image-preview" hidden role="dialog" aria-modal="true" aria-label="結果画像の確認" style="position:fixed;inset:0;background:#10251de8;z-index:100;overflow:auto;padding:20px;display:none;align-items:center;justify-content:center">
+      <div style="width:min(100%,520px);background:white;padding:18px;border-radius:20px">
+        <p style="font-weight:900;margin:0 0 12px">この画像をシェアします</p>
+        <img id="preview-img" alt="クイズ結果の共有画像" style="width:100%;display:block;border-radius:12px">
+        <button id="confirm-image-share" class="primary" type="button" style="margin-top:16px">画像を共有する</button>
+        <button id="download-image" class="secondary" type="button">画像を保存する</button>
+        <button id="close-image-preview" class="secondary" type="button">戻る</button>
+      </div>
+    </div>
     <div class="foot">このクイズは非公式のファン作品です。埼玉県・自治体による公式企画ではありません。</div>
   </main>
   <script>
@@ -126,7 +135,7 @@
     function choose(){return shuffle(QUESTIONS).slice(0,10)}
     function show(which){for(const id of ["start","quiz","result"])$(id).hidden=id!==which;window.scrollTo({top:0,behavior:"instant"})}
     function stopTimer(){if(state.timer!==null){clearInterval(state.timer);state.timer=null}}
-    function start(){stopTimer();state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
+    function start(){stopTimer();$("copy-btn").textContent="コピーして結果をシェア";state.selected=choose();state.index=0;state.points=0;state.correct=0;show("quiz");renderQuestion()}
     function renderQuestion(){
       state.locked=false;const q=state.selected[state.index];
       $("count").textContent=`第${state.index+1}問 / 10問`;
@@ -164,11 +173,15 @@
     function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
     function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n▼ 埼玉愛クイズに挑戦\nhttps://tonde-saitama007.github.io/saitama-ai-quiz/\n#埼玉愛クイズ`}
     async function copyResult(){try{await navigator.clipboard.writeText(shareText());$("copy-btn").textContent="コピーしました！"}catch{const t=document.createElement("textarea");t.value=shareText();document.body.append(t);t.select();const ok=document.execCommand("copy");t.remove();$("copy-btn").textContent=ok?"コピーしました！":"コピーできませんでした"}}
+    let imageBlob=null;
+    let imagePreviewUrl=null;
+    function closeImagePreview(){
+      const dialog=$("image-preview");
+      dialog.style.display="none";dialog.hidden=true;
+    }
     async function shareResultImage(){
       const button=$("image-share-btn");
-      button.disabled=true;
-      const original=button.textContent;
-      button.textContent="画像を準備中…";
+      button.disabled=true;button.textContent="画像を準備中…";
       try{
         const canvas=document.createElement("canvas");
         canvas.width=1080;canvas.height=1080;
@@ -199,28 +212,44 @@
         ctx.fillStyle="#865016";ctx.fillText(rank,154,759);
         ctx.fillStyle="#4c645d";ctx.font='39px "Noto Sans JP",sans-serif';
         ctx.fillText(description,115,885);
-        const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
-        if(!blob)throw new Error("PNG unavailable");
-        const file=new File([blob],"saitama-love-quiz-result.png",{type:"image/png"});
-        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-          try{await navigator.share({files:[file]});return}
-          catch(error){if(error.name==="AbortError")return}
-        }
-        const url=URL.createObjectURL(blob);
-        const link=document.createElement("a");link.href=url;link.download=file.name;
-        document.body.appendChild(link);link.click();link.remove();
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-        alert("結果画像を保存しました。SNSの投稿画面から画像を選んでください。");
+
+        imageBlob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+        if(!imageBlob)throw new Error("PNG unavailable");
+        if(imagePreviewUrl)URL.revokeObjectURL(imagePreviewUrl);
+        imagePreviewUrl=URL.createObjectURL(imageBlob);
+        $("preview-img").src=imagePreviewUrl;
+        $("image-preview").hidden=false;
+        $("image-preview").style.display="flex";
       }catch(error){
-        alert("画像を作成できませんでした。文章コピーで共有してください。");
+        alert("結果画像を作成できませんでした。文章コピーをお使いください。");
       }finally{
-        button.disabled=false;button.textContent=original;
+        button.disabled=false;button.textContent="結果画像をシェア";
       }
     }
+    function downloadResultImage(){
+      if(!imageBlob)return;
+      const url=URL.createObjectURL(imageBlob);
+      const link=document.createElement("a");
+      link.href=url;link.download="saitama-love-quiz-result.png";
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }
     $("image-share-btn").addEventListener("click",shareResultImage);
+    $("close-image-preview").addEventListener("click",closeImagePreview);
+    $("download-image").addEventListener("click",downloadResultImage);
+    $("confirm-image-share").addEventListener("click",async()=>{
+      if(!imageBlob)return;
+      const file=new File([imageBlob],"saitama-love-quiz-result.png",{type:"image/png"});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file]});return}
+        catch(error){if(error.name==="AbortError")return}
+      }
+      downloadResultImage();
+      alert("この端末では画像の直接共有ができないため、画像を保存しました。");
+    });
     $("start-btn").addEventListener("click",start);
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
-    $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
+    $("retry-btn").addEventListener("click",()=>{stopTimer();$("copy-btn").textContent="コピーして結果をシェア";show("start")});
     $("copy-btn").addEventListener("click",copyResult);
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
