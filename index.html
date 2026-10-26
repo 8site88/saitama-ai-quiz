@@ -210,7 +210,13 @@
         ctx.fillStyle="#ffedbf";ctx.beginPath();ctx.roundRect(115,695,chipWidth,95,48);ctx.fill();
         ctx.fillStyle="#865016";ctx.fillText(rank,154,759);
         ctx.fillStyle="#4c645d";ctx.font='39px "Noto Sans JP",sans-serif';
-        ctx.fillText(description,115,885);
+        ctx.fillText(description,115,865);
+        ctx.fillStyle="#dce7db";ctx.fillRect(115,902,850,2);
+        ctx.fillStyle="#205b4d";ctx.font='bold 29px "Noto Sans JP",sans-serif';
+        ctx.fillText("▼ 埼玉愛クイズに挑戦",115,945);
+        ctx.font="25px sans-serif";
+        ctx.fillText("https://tonde-saitama007.github.io/",115,978);
+        ctx.fillText("saitama-ai-quiz/",115,1008);
 
         imageBlob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
         if(!imageBlob)throw new Error("PNG unavailable");
