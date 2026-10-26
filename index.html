@@ -79,7 +79,8 @@
       <div id="rank" class="title-chip"></div>
       <p id="result-copy" class="result-copy"></p>
       <p id="result-meta" class="result-meta"></p>
-      <button id="copy-btn" class="primary" type="button">コピーして結果をシェア</button>
+      <button id="image-share-btn" class="primary" type="button">結果画像をシェア</button>
+      <button id="copy-btn" class="secondary" type="button">コピーして結果をシェア</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
     <div class="foot">このクイズは非公式のファン作品です。埼玉県・自治体による公式企画ではありません。</div>
@@ -163,6 +164,60 @@
     function finish(){stopTimer();const [title,copy]=rankFor(state.points);$("final-score").textContent=state.points;$("rank").textContent=title;$("result-copy").textContent=copy;$("result-meta").textContent=`10問中${state.correct}問正解`;$("progress").style.width="100%";show("result")}
     function shareText(){const [title]=rankFor(state.points);return `あなたの埼玉愛は何点？\n${state.points}点／100点！称号は「${title}」🗾\n10問中${state.correct}問正解。あなたも挑戦！\n▼ 埼玉愛クイズに挑戦\nhttps://tonde-saitama007.github.io/saitama-ai-quiz/\n#埼玉愛クイズ`}
     async function copyResult(){try{await navigator.clipboard.writeText(shareText());$("copy-btn").textContent="コピーしました！"}catch{const t=document.createElement("textarea");t.value=shareText();document.body.append(t);t.select();const ok=document.execCommand("copy");t.remove();$("copy-btn").textContent=ok?"コピーしました！":"コピーできませんでした"}}
+    async function shareResultImage(){
+      const button=$("image-share-btn");
+      button.disabled=true;
+      const original=button.textContent;
+      button.textContent="画像を準備中…";
+      try{
+        const canvas=document.createElement("canvas");
+        canvas.width=1080;canvas.height=1080;
+        const ctx=canvas.getContext("2d");
+        if(!ctx)throw new Error("Canvas unavailable");
+        ctx.fillStyle="#eff4e9";ctx.fillRect(0,0,1080,1080);
+        ctx.fillStyle="#1e664f";
+        ctx.beginPath();ctx.roundRect(55,50,100,100,24);ctx.fill();
+        ctx.fillStyle="#fff";ctx.font='bold 65px "Noto Sans JP",sans-serif';
+        ctx.textAlign="center";ctx.fillText("彩",105,123);
+        ctx.textAlign="left";ctx.fillStyle="#205b4d";
+        ctx.font='bold 43px sans-serif';ctx.fillText("SAITAMA LOVE QUIZ",180,115);
+        ctx.shadowColor="rgba(36,75,48,.12)";ctx.shadowBlur=28;ctx.shadowOffsetY=12;
+        ctx.fillStyle="#fff";ctx.beginPath();ctx.roundRect(55,190,970,835,42);ctx.fill();
+        ctx.shadowColor="transparent";ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+        ctx.fillStyle="#bd5b29";ctx.font="bold 33px sans-serif";ctx.fillText("RESULT",115,285);
+        ctx.fillStyle="#183a35";ctx.font='bold 65px "Noto Sans JP",sans-serif';
+        ctx.fillText("あなたの埼玉愛は…",115,395);
+        ctx.fillStyle="#11734f";ctx.font="bold 175px sans-serif";
+        const score=String(state.points);
+        ctx.fillText(score,115,630);
+        const scoreWidth=ctx.measureText(score).width;
+        ctx.font='bold 57px "Noto Sans JP",sans-serif';ctx.fillText("点 / 100点",135+scoreWidth,620);
+        const [rank,description]=rankFor(state.points);
+        ctx.font='bold 46px "Noto Sans JP",sans-serif';
+        const chipWidth=Math.min(850,ctx.measureText(rank).width+78);
+        ctx.fillStyle="#ffedbf";ctx.beginPath();ctx.roundRect(115,695,chipWidth,95,48);ctx.fill();
+        ctx.fillStyle="#865016";ctx.fillText(rank,154,759);
+        ctx.fillStyle="#4c645d";ctx.font='39px "Noto Sans JP",sans-serif';
+        ctx.fillText(description,115,885);
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+        if(!blob)throw new Error("PNG unavailable");
+        const file=new File([blob],"saitama-love-quiz-result.png",{type:"image/png"});
+        if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+          try{await navigator.share({files:[file]});return}
+          catch(error){if(error.name==="AbortError")return}
+        }
+        const url=URL.createObjectURL(blob);
+        const link=document.createElement("a");link.href=url;link.download=file.name;
+        document.body.appendChild(link);link.click();link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+        alert("結果画像を保存しました。SNSの投稿画面から画像を選んでください。");
+      }catch(error){
+        alert("画像を作成できませんでした。文章コピーで共有してください。");
+      }finally{
+        button.disabled=false;button.textContent=original;
+      }
+    }
+    $("image-share-btn").addEventListener("click",shareResultImage);
     $("start-btn").addEventListener("click",start);
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
