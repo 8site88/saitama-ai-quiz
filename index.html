@@ -177,18 +177,10 @@
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
     $("copy-btn").addEventListener("click",copyResult);
-    $("share-btn").addEventListener("click",async()=>{
-      const text=shareText();
-      if(navigator.share){
-        try{
-          await navigator.share({text});
-          return;
-        }catch(err){
-          if(err.name==="AbortError")return;
-        }
-      }
-      await copyResult();
-      alert("共有文をコピーしました。Threadsアプリを開いて投稿欄に貼り付けてください。");
+    $("share-btn").addEventListener("click",()=>{
+      const url=new URL("https://www.threads.com/intent/post");
+      url.searchParams.set("text","https://tinyurl.com/saitamaai");
+      window.location.assign(url.toString());
     });
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
