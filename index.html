@@ -177,7 +177,19 @@
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
     $("copy-btn").addEventListener("click",copyResult);
-    $("share-btn").addEventListener("click",async()=>{const text=shareText();let copied=false;try{await navigator.clipboard.writeText(text);copied=true}catch{const t=document.createElement("textarea");t.value=text;document.body.append(t);t.select();copied=document.execCommand("copy");t.remove()}if(copied){alert("結果の文章をコピーしました。Threadsの投稿画面に文章が出ない場合は、入力欄を長押しして「貼り付け」を選んでください。")}else{alert("自動コピーできませんでした。「共有文をコピー」から文章をコピーしてThreadsに貼り付けてください。")}const url=new URL("https://www.threads.com/intent/post");url.searchParams.set("text",text);window.location.href=url.toString()});
+    $("share-btn").addEventListener("click",async()=>{
+      const text=shareText();
+      if(navigator.share){
+        try{
+          await navigator.share({title:"埼玉愛クイズの結果",text});
+          return;
+        }catch(err){
+          if(err.name==="AbortError")return;
+        }
+      }
+      await copyResult();
+      alert("共有文をコピーしました。Threadsアプリを開いて投稿欄に貼り付けてください。");
+    });
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
 </body>
