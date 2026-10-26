@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#173f38">
   <meta name="description" content="埼玉の名所・歴史・グルメに挑戦！30問から10問が出る、15秒制限の埼玉愛クイズ。">
@@ -60,7 +61,7 @@
       <h1>あなたの埼玉愛は<br>何点？</h1>
       <p class="lead">名所、グルメ、歴史まで。10問であなたの埼玉愛を測ろう！</p>
       <div class="howto"><strong>遊び方</strong><br>30問からランダムで10問。各問4択、制限時間は15秒。正解8点＋早押しボーナス最大2点で、100点満点！</div>
-      <button id="start-btn" class="primary" type="button">クイズを始める →</button>
+      <button id="start-btn" class="primary" type="button" onclick="window.quizStartFallback && window.quizStartFallback()">クイズを始める →</button>
     </section>
     <section id="quiz" class="card" hidden aria-live="off">
       <div class="topline"><span id="count"></span><span id="score"></span></div>
@@ -219,7 +220,7 @@
       }
     }
     $("image-share-btn").addEventListener("click",shareResultImage);
-    $("start-btn").addEventListener("click",start);
+    window.quizStartFallback=start;
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();$("copy-btn").textContent="シェア用リンクをコピー";show("start")});
     $("copy-btn").addEventListener("click",copyResult);
