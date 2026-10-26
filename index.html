@@ -177,7 +177,7 @@
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
     $("retry-btn").addEventListener("click",()=>{stopTimer();show("start")});
     $("copy-btn").addEventListener("click",copyResult);
-    $("share-btn").addEventListener("click",()=>{const url=new URL("https://www.threads.com/intent/post");url.searchParams.set("text",shareText());window.open(url.toString(),"_blank","noopener,noreferrer")});
+    $("share-btn").addEventListener("click",()=>{const url=new URL("https://www.threads.com/intent/post");const text=shareText().replace(location.href.split("#")[0],"").trim();url.searchParams.set("text",text);url.searchParams.set("url","https://tonde-saitama007.github.io/saitama-ai-quiz/");window.location.href=url.toString()});
     document.addEventListener("visibilitychange",()=>{if(document.hidden===false&&state.timer!==null)tick()});
   </script>
 </body>
