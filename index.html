@@ -79,13 +79,13 @@
       <div id="rank" class="title-chip"></div>
       <p id="result-copy" class="result-copy"></p>
       <p id="result-meta" class="result-meta"></p>
-      <button id="image-share-btn" class="primary" type="button">結果画像をシェア</button>
+      <button id="image-share-btn" class="primary" type="button">結果画像を見る</button>
       <button id="copy-btn" class="secondary" type="button">コピーして結果をシェア</button>
       <button id="retry-btn" class="secondary" type="button">もう一度挑戦</button>
     </section>
     <div id="image-preview" hidden role="dialog" aria-modal="true" aria-label="結果画像の確認" style="position:fixed;inset:0;background:#10251de8;z-index:100;overflow:auto;padding:20px;display:none;align-items:center;justify-content:center">
       <div style="width:min(100%,520px);background:white;padding:18px;border-radius:20px">
-        <p style="font-weight:900;margin:0 0 12px">この画像をシェアします</p>
+        <p style="font-weight:900;margin:0 0 12px">結果画像のプレビュー</p><p style="margin:0 0 12px;font-size:.9rem;color:#4c645d">画像を確認してから、保存または共有できます。</p>
         <img id="preview-img" alt="クイズ結果の共有画像" style="width:100%;display:block;border-radius:12px">
         <button id="confirm-image-share" class="primary" type="button" style="margin-top:16px">画像を共有する</button>
         <button id="download-image" class="secondary" type="button">画像を保存する</button>
@@ -223,7 +223,7 @@
       }catch(error){
         alert("結果画像を作成できませんでした。文章コピーをお使いください。");
       }finally{
-        button.disabled=false;button.textContent="結果画像をシェア";
+        button.disabled=false;button.textContent="結果画像を見る";
       }
     }
     function downloadResultImage(){
