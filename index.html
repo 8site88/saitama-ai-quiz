@@ -224,6 +224,8 @@
         if(imagePreviewUrl)URL.revokeObjectURL(imagePreviewUrl);
         imagePreviewUrl=URL.createObjectURL(imageBlob);
         $("preview-img").src=imagePreviewUrl;
+        $("download-help").textContent="保存すると通常は「ダウンロード」フォルダに入ります。保存できない場合は上の画像を長押しして保存してください。";
+        $("copy-share-url").textContent="投稿用URLをコピー";
         $("image-preview").hidden=false;
         $("image-preview").style.display="flex";
       }catch(error){
