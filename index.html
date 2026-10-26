@@ -85,10 +85,10 @@
     </section>
     <div id="image-preview" hidden role="dialog" aria-modal="true" aria-label="結果画像の確認" style="position:fixed;inset:0;background:#10251de8;z-index:100;overflow:auto;padding:20px;display:none;align-items:center;justify-content:center">
       <div style="width:min(100%,520px);background:white;padding:18px;border-radius:20px">
-        <p style="font-weight:900;margin:0 0 12px">結果画像のプレビュー</p><p style="margin:0 0 12px;font-size:.9rem;color:#4c645d">結果画像を確認して保存できます。</p>
+        <p style="font-weight:900;margin:0 0 12px">結果画像のプレビュー</p><p style="margin:0 0 12px;font-size:.9rem;color:#4c645d">① 画像を保存してThreadsに画像だけ投稿。② 投稿した画像に返信し、コピーしたURLを貼り付けてください。</p>
         <img id="preview-img" alt="クイズ結果の共有画像" style="width:100%;display:block;border-radius:12px">
         <button id="download-image" class="primary" type="button" style="margin-top:16px">画像を保存する</button>
-        <button id="copy-share-url" class="secondary" type="button">投稿用URLをコピー</button><p id="download-help" role="status" style="font-size:.85rem;color:#4c645d;margin:10px 0">通常は「ダウンロード」フォルダに保存されます。保存できない場合は、上の画像を長押しして「画像をダウンロード」を選んでください。</p>
+        <button id="copy-share-url" class="secondary" type="button">返信用URLをコピー</button><p id="download-help" role="status" style="font-size:.85rem;color:#4c645d;margin:10px 0">通常は「ダウンロード」フォルダに保存されます。保存できない場合は、上の画像を長押しして「画像をダウンロード」を選んでください。</p>
         <button id="close-image-preview" class="secondary" type="button">戻る</button>
       </div>
     </div>
@@ -212,20 +212,13 @@
         ctx.fillStyle="#865016";ctx.fillText(rank,154,759);
         ctx.fillStyle="#4c645d";ctx.font='39px "Noto Sans JP",sans-serif';
         ctx.fillText(description,115,865);
-        ctx.fillStyle="#dce7db";ctx.fillRect(115,902,850,2);
-        ctx.fillStyle="#205b4d";ctx.font='bold 29px "Noto Sans JP",sans-serif';
-        ctx.fillText("▼ 埼玉愛クイズに挑戦",115,945);
-        ctx.font="25px sans-serif";
-        ctx.fillText("https://tonde-saitama007.github.io/",115,978);
-        ctx.fillText("saitama-ai-quiz/",115,1008);
-
         imageBlob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
         if(!imageBlob)throw new Error("PNG unavailable");
         if(imagePreviewUrl)URL.revokeObjectURL(imagePreviewUrl);
         imagePreviewUrl=URL.createObjectURL(imageBlob);
         $("preview-img").src=imagePreviewUrl;
         $("download-help").textContent="保存すると通常は「ダウンロード」フォルダに入ります。保存できない場合は上の画像を長押しして保存してください。";
-        $("copy-share-url").textContent="投稿用URLをコピー";
+        $("copy-share-url").textContent="返信用URLをコピー";
         $("image-preview").hidden=false;
         $("image-preview").style.display="flex";
       }catch(error){
@@ -256,7 +249,7 @@
         try{copied=document.execCommand("copy")}catch(e){}
         input.remove();
       }
-      $("copy-share-url").textContent=copied?"URLをコピーしました！":"コピーできませんでした";
+      $("copy-share-url").textContent=copied?"返信用URLをコピーしました！":"コピーできませんでした";
     });
     $("start-btn").addEventListener("click",start);
     $("next-btn").addEventListener("click",()=>{if(state.index===9)finish();else{state.index++;renderQuestion()}});
